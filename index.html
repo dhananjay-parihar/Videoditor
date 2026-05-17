@@ -3,63 +3,288 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1179/1179120.png">
 <title>Browser Video Editor</title>
 
 <style>
-:root{--bg:#0f172a;--card:#0b1220;--muted:#94a3b8;--accent:#06b6d4;--glass:rgba(255,255,255,0.03)}
-html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;color:#e6eef6;background:#071526}
-.app{height:100vh;display:flex;flex-direction:column;gap:12px;padding:14px;box-sizing:border-box}
-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-h1{margin:0;font-size:18px}
-.btn{background:#1e293b;border:1px solid #334;padding:8px 12px;border-radius:10px;color:#e6eef6;cursor:pointer;font-family:inherit}
-.btn:disabled{opacity:0.5;cursor:not-allowed}
-.btn.ghost{background:transparent;border:1px dashed #334}
-main{flex:1;overflow:auto;padding:10px;background:rgba(255,255,255,0.03);border-radius:10px}
-.grid{display:grid;grid-template-columns:1fr;gap:12px}
-.card{background:#0b1220;padding:10px;border-radius:10px;display:flex;flex-direction:row;gap:12px;border:1px solid #1a2536}
-.video-section{flex:1;display:flex;flex-direction:column;gap:8px}
-.controls-section{flex:1;display:flex;flex-direction:column;gap:8px}
-.video-frame{height:100%;min-height:400px;display:flex;align-items:center;justify-content:center;background:#111;border-radius:8px;overflow:hidden}
-.video-frame video{max-width:100%;max-height:100%;object-fit:contain}
-
-@media (max-width: 768px) {
-  .app{padding:8px;gap:8px}
-  header{flex-direction:column;align-items:stretch}
-  h1{font-size:16px;text-align:center}
-  .grid{gap:8px}
-  .card{flex-direction:column;padding:8px;gap:8px}
-  .video-section{width:100%}
-  .controls-section{width:100%}
-  .video-frame{min-height:200px;height:auto}
-  .actions{justify-content:center}
-  .clip-actions{justify-content:center;flex-wrap:wrap}
-  .inrow{justify-content:center}
-  .btn{font-size:13px;padding:6px 10px}
-  .small{font-size:12px;padding:3px 6px}
-  .notice{font-size:11px;padding:6px 8px}
-  main{padding:8px}
-  footer{flex-direction:column;gap:6px;font-size:12px}
+:root{
+--bg:#0f172a;
+--card:#0b1220;
+--muted:#94a3b8;
+--accent:#06b6d4;
+--glass:rgba(255,255,255,0.03)
 }
-.meta{display:flex;justify-content:space-between;font-size:13px;color:#94a3b8}
-.actions{display:flex;flex-wrap:wrap;gap:6px}
-.small{font-size:13px;padding:4px 7px}
-.timestampBar{font-size:12px;color:#cde1ff;display:flex;justify-content:space-between}
-.inrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.inrow input{width:85px;padding:4px;border-radius:6px;border:1px solid #334;background:#112;color:#eef;font-size:12px}
-.inrow input.editing{background:#1a2536;border-color:#06b6d4}
-.clips-list{background:#111;padding:6px;border-radius:6px;font-size:13px;max-height:110px;overflow:auto}
-.clip-item{display:flex;justify-content:space-between;align-items:center;padding:6px;margin:4px 0;background:#1a2536;border-radius:4px;gap:6px;flex-wrap:wrap}
-.clip-item.editing{background:#0f4a5a;border:1px solid #06b6d4}
-.clip-text{flex:1;min-width:150px}
-.clip-actions{display:flex;gap:4px;flex-wrap:wrap}
-#progressContainer{width:100%;height:6px;background:#1e293b;border-radius:4px;overflow:hidden;display:none}
-#progressBar{height:100%;width:0%;background:#06b6d4;transition:width .25s}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;align-items:center;justify-content:center}
-.modal-content{background:#0b1220;padding:20px;border-radius:10px;border:1px solid #334;max-width:400px;width:90%}
-.modal-content h3{Margin-top:0}
-.modal-actions{display:flex;gap:10px;margin-top:15px;justify-content:flex-end}
-.notice{background:#334;padding:8px 12px;border-radius:6px;font-size:12px;color:#ffd700;margin-top:8px}
+
+html,body{
+height:100%;
+margin:0;
+font-family:Inter,system-ui,Arial;
+color:#e6eef6;
+background:#071526
+}
+
+.app{
+height:100vh;
+display:flex;
+flex-direction:column;
+gap:12px;
+padding:14px;
+box-sizing:border-box
+}
+
+header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+flex-wrap:wrap;
+gap:10px
+}
+
+h1{
+margin:0;
+font-size:18px
+}
+
+.btn{
+background:#1e293b;
+border:1px solid #334;
+padding:8px 12px;
+border-radius:10px;
+color:#e6eef6;
+cursor:pointer;
+font-family:inherit
+}
+
+.btn:disabled{
+opacity:0.5;
+cursor:not-allowed
+}
+
+.btn.ghost{
+background:transparent;
+border:1px dashed #334
+}
+
+main{
+flex:1;
+overflow:auto;
+padding:10px;
+background:rgba(255,255,255,0.03);
+border-radius:10px
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr;
+gap:12px
+}
+
+.card{
+background:#0b1220;
+padding:10px;
+border-radius:10px;
+display:flex;
+flex-direction:row;
+gap:12px;
+border:1px solid #1a2536
+}
+
+.video-section{
+flex:1;
+display:flex;
+flex-direction:column;
+gap:8px
+}
+
+.controls-section{
+flex:1;
+display:flex;
+flex-direction:column;
+gap:8px
+}
+
+.video-frame{
+height:100%;
+min-height:400px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#111;
+border-radius:8px;
+overflow:hidden
+}
+
+.video-frame video{
+max-width:100%;
+max-height:100%;
+object-fit:contain
+}
+
+@media (max-width:768px){
+
+.app{
+padding:8px;
+gap:8px
+}
+
+header{
+flex-direction:column;
+align-items:stretch
+}
+
+h1{
+font-size:16px;
+text-align:center
+}
+
+.grid{
+gap:8px
+}
+
+.card{
+flex-direction:column;
+padding:8px;
+gap:8px
+}
+
+.video-section{
+width:100%
+}
+
+.controls-section{
+width:100%
+}
+
+.video-frame{
+min-height:220px
+}
+
+.actions{
+justify-content:center
+}
+
+.clip-actions{
+justify-content:center;
+flex-wrap:wrap
+}
+
+.inrow{
+justify-content:center
+}
+
+.btn{
+font-size:13px;
+padding:6px 10px
+}
+
+main{
+padding:8px
+}
+
+footer{
+flex-direction:column;
+gap:6px;
+font-size:12px
+}
+}
+
+.meta{
+display:flex;
+justify-content:space-between;
+font-size:13px;
+color:#94a3b8
+}
+
+.actions{
+display:flex;
+flex-wrap:wrap;
+gap:6px
+}
+
+.small{
+font-size:13px;
+padding:4px 7px
+}
+
+.timestampBar{
+font-size:12px;
+color:#cde1ff;
+display:flex;
+justify-content:space-between
+}
+
+.inrow{
+display:flex;
+gap:6px;
+align-items:center;
+flex-wrap:wrap
+}
+
+.inrow input{
+width:100px;
+padding:4px;
+border-radius:6px;
+border:1px solid #334;
+background:#112;
+color:#eef;
+font-size:12px
+}
+
+.clips-list{
+background:#111;
+padding:6px;
+border-radius:6px;
+font-size:13px;
+max-height:180px;
+overflow:auto
+}
+
+.clip-item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:6px;
+margin:4px 0;
+background:#1a2536;
+border-radius:4px;
+gap:6px;
+flex-wrap:wrap
+}
+
+.clip-text{
+flex:1;
+min-width:150px
+}
+
+.clip-actions{
+display:flex;
+gap:4px;
+flex-wrap:wrap
+}
+
+#progressContainer{
+width:100%;
+height:6px;
+background:#1e293b;
+border-radius:4px;
+overflow:hidden;
+display:none
+}
+
+#progressBar{
+height:100%;
+width:0%;
+background:#06b6d4;
+transition:width .25s
+}
+
+.notice{
+background:#334;
+padding:8px 12px;
+border-radius:6px;
+font-size:12px;
+color:#ffd700;
+margin-top:8px
+}
 </style>
 </head>
 <body>
@@ -67,899 +292,628 @@ main{flex:1;overflow:auto;padding:10px;background:rgba(255,255,255,0.03);border-
 <div class="app">
 
 <header>
-  <h1>Browser Video Editor</h1>
-  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-    <label for="files" class="btn">Select Videos</label>
-    <input id="files" type="file" multiple accept="video/*" style="display:none">
-    <button id="exportBtn" class="btn">Export All (Merge)</button>
-    <button id="downloadAllBtn" class="btn">Download All Clips</button>
-    <button id="clearBtn" class="btn ghost">Clear All</button>
-  </div>
+
+<h1>Browser Video Editor</h1>
+
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+
+<label for="files" class="btn">
+Select Videos
+</label>
+
+<input
+id="files"
+type="file"
+multiple
+accept="video/*"
+style="display:none"
+>
+
+<button id="exportBtn" class="btn">
+Export All (Merge)
+</button>
+
+<button id="downloadAllBtn" class="btn">
+Download All Clips
+</button>
+
+<button id="clearBtn" class="btn ghost">
+Clear All
+</button>
+
+</div>
+
 </header>
 
-<div id="progressContainer"><div id="progressBar"></div></div>
+<div id="progressContainer">
+<div id="progressBar"></div>
+</div>
 
-<main><div id="grid" class="grid"></div></main>
+<main>
+<div id="grid" class="grid"></div>
+</main>
 
 <footer style="display:flex;gap:10px;flex-wrap:wrap">
-  <div id="status" style="font-size:13px;color:#94a3b8">No videos loaded.</div>
-  <div style="margin-left:auto;font-size:13px;color:#94a3b8" id="ffmpegStatus">FFmpeg: Not loaded</div>
+
+<div id="status" style="font-size:13px;color:#94a3b8">
+No videos loaded.
+</div>
+
+<div
+style="margin-left:auto;font-size:13px;color:#94a3b8"
+id="ffmpegStatus"
+>
+FFmpeg: Not loaded
+</div>
+
 </footer>
 
 </div>
 
-<!-- Edit Modal -->
-<div id="editModal" class="modal">
-  <div class="modal-content">
-    <h3>Edit Clip</h3>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      <div class="inrow">
-        <label>Start:</label>
-        <input id="editStart" placeholder="0:00.000">
-      </div>
-      <div class="inrow">
-        <label>End:</label>
-        <input id="editEnd" placeholder="0:00.000">
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn ghost" id="cancelEdit">Cancel</button>
-      <button class="btn" id="saveEdit">Save</button>
-    </div>
-  </div>
+<script type="module">
+
+import {
+createFFmpeg,
+fetchFile
+} from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js';
+
+const filesInput =
+document.getElementById('files');
+
+const grid =
+document.getElementById('grid');
+
+const statusEl =
+document.getElementById('status');
+
+const ffmpegStatus =
+document.getElementById('ffmpegStatus');
+
+const progressContainer =
+document.getElementById('progressContainer');
+
+const progressBar =
+document.getElementById('progressBar');
+
+const exportBtn =
+document.getElementById('exportBtn');
+
+const downloadAllBtn =
+document.getElementById('downloadAllBtn');
+
+const clearBtn =
+document.getElementById('clearBtn');
+
+let ffmpeg = null;
+
+let videos = [];
+
+let allClips = [];
+
+async function loadFFmpeg(){
+
+if(ffmpeg) return ffmpeg;
+
+ffmpegStatus.textContent =
+'FFmpeg: Loading...';
+
+ffmpeg = createFFmpeg({
+
+log:true,
+
+progress:({ ratio })=>{
+
+progressContainer.style.display =
+'block';
+
+progressBar.style.width =
+`${Math.round(ratio * 100)}%`;
+
+},
+
+corePath:
+'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+
+});
+
+await ffmpeg.load();
+
+ffmpegStatus.textContent =
+'FFmpeg: Loaded';
+
+return ffmpeg;
+}
+
+function formatTime(sec){
+
+sec = Math.max(sec,0);
+
+const m = Math.floor(sec / 60);
+
+const s = Math.floor(sec % 60);
+
+const ms =
+Math.floor((sec % 1) * 1000);
+
+return `${m}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
+}
+
+filesInput.addEventListener(
+'change',
+async(e)=>{
+
+const files =
+[...e.target.files];
+
+if(!files.length) return;
+
+statusEl.textContent =
+`${files.length} video(s) loaded`;
+
+for(const file of files){
+
+const url =
+URL.createObjectURL(file);
+
+const id =
+Date.now() + Math.random();
+
+videos.push({
+id,
+file,
+url,
+clips:[]
+});
+
+renderVideo(
+videos[videos.length - 1]
+);
+
+}
+
+});
+
+function renderVideo(videoData){
+
+const card =
+document.createElement('div');
+
+card.className = 'card';
+
+card.innerHTML = `
+
+<div class="video-section">
+
+<div class="video-frame">
+<video controls src="${videoData.url}"></video>
 </div>
 
-<script>
-const filesInput=document.getElementById("files");
-const grid=document.getElementById("grid");
-const status=document.getElementById("status");
-const exportBtn=document.getElementById("exportBtn");
-const downloadAllBtn=document.getElementById("downloadAllBtn");
-const clearBtn=document.getElementById("clearBtn");
-const ffmpegStatus=document.getElementById("ffmpegStatus");
-const editModal=document.getElementById("editModal");
-const editStart=document.getElementById("editStart");
-const editEnd=document.getElementById("editEnd");
-const saveEdit=document.getElementById("saveEdit");
-const cancelEdit=document.getElementById("cancelEdit");
+<div class="meta">
+<div>${videoData.file.name}</div>
+<div class="duration">Loading...</div>
+</div>
 
-let videos=[];
-let playingId=null;
-let editingClip=null;
+</div>
 
-filesInput.addEventListener("change",async e=>{
-  const list=[...e.target.files];
-  if(!list.length) return;
-  status.textContent="Loading...";
-  for(const f of list){
-    const id=crypto.randomUUID();
-    const url=URL.createObjectURL(f);
-    const item={id,file:f,url,title:f.name,size:f.size,duration:0,clips:[],tmpStart:null,tmpEnd:null};
-    videos.push(item);
-    addCard(item);
-    await loadMetadata(item);
-  }
-  status.textContent=`Loaded ${videos.length} video(s).`;
-  filesInput.value='';
+<div class="controls-section">
+
+<div class="timestampBar">
+<span class="current">0:00.000</span>
+<span class="total">0:00.000</span>
+</div>
+
+<div class="actions">
+
+<button class="btn small markStart">
+Mark Start
+</button>
+
+<button class="btn small markEnd">
+Mark End
+</button>
+
+<button class="btn small addClip">
+Add Clip
+</button>
+
+<button class="btn small exportVideo">
+Export Clips
+</button>
+
+</div>
+
+<div class="inrow">
+<input class="startInput" placeholder="Start">
+<input class="endInput" placeholder="End">
+</div>
+
+<div class="clips-list"></div>
+
+<div class="notice">
+Use Mark Start and Mark End while video plays.
+</div>
+
+</div>
+`;
+
+grid.appendChild(card);
+
+const video =
+card.querySelector('video');
+
+const durationEl =
+card.querySelector('.duration');
+
+const currentEl =
+card.querySelector('.current');
+
+const totalEl =
+card.querySelector('.total');
+
+const startInput =
+card.querySelector('.startInput');
+
+const endInput =
+card.querySelector('.endInput');
+
+const clipsList =
+card.querySelector('.clips-list');
+
+video.addEventListener(
+'loadedmetadata',
+()=>{
+
+durationEl.textContent =
+formatTime(video.duration);
+
+totalEl.textContent =
+formatTime(video.duration);
+
 });
 
-function addCard(item){
-  const card=document.createElement("div");
-  card.className="card";
-  card.id="card-"+item.id;
+video.addEventListener(
+'timeupdate',
+()=>{
 
-  card.innerHTML=`
-    <div class="video-section">
-      <div class="video-frame">
-        <video id="video-${item.id}" src="${item.url}" controls></video>
-      </div>
-    </div>
+currentEl.textContent =
+formatTime(video.currentTime);
 
-    <div class="controls-section">
-      <div class="meta"><strong>${item.title}</strong><span id="meta-${item.id}">--</span></div>
-
-      <div class="timestampBar">
-        <span id="ctime-${item.id}">00:00.000</span>
-        <span id="aduration-${item.id}"></span>
-      </div>
-
-      <div class="inrow">
-        Start: <input id="start-${item.id}" placeholder="0:00.000">
-        End: <input id="end-${item.id}" placeholder="0:00.000">
-        <button class="small btn" data-action="apply" data-id="${item.id}">Add Clip</button>
-      </div>
-
-      <div class="actions">
-        <button class="small btn" data-action="play" data-id="${item.id}">Play</button>
-        <button class="small btn" data-action="pause" data-id="${item.id}">Pause</button>
-        <button class="small btn" data-action="setStart" data-id="${item.id}">Set Start</button>
-        <button class="small btn" data-action="setEnd" data-id="${item.id}">Set End</button>
-        <button class="small btn" data-action="remove" data-id="${item.id}">Remove Video</button>
-      </div>
-
-      <div class="clips-list" id="clips-${item.id}">No clips.</div>
-      
-      <div class="notice">💡 Tip: "Download" saves individual clips. "Export All" merges all clips into one video with SRT subtitles showing clip info.</div>
-    </div>
-  `;
-
-  grid.appendChild(card);
-
-  const vid=document.getElementById("video-"+item.id);
-  vid.addEventListener("play",()=>{pauseAllExcept(item.id);playingId=item.id});
-  vid.addEventListener("pause",()=>{if(playingId===item.id) playingId=null});
-
-  vid.addEventListener("timeupdate",()=>{ document.getElementById("ctime-"+item.id).textContent=formatMS(vid.currentTime); });
-
-  card.addEventListener("click",e=>{
-    const btn=e.target.closest("button");
-    if(!btn) return;
-    const id=btn.dataset.id;
-    const act=btn.dataset.action;
-    const v=videos.find(x=>x.id===id);
-    if(v) handleAction(act,v);
-  });
-}
-
-function pauseAllExcept(id){
-  videos.forEach(v=>{
-    if(v.id!==id){
-      let x=document.getElementById("video-"+v.id);
-      if(x && !x.paused) x.pause();
-    }
-  });
-}
-
-async function loadMetadata(item){
-  const vid=document.getElementById("video-"+item.id);
-  return new Promise(res=>{
-    vid.onloadedmetadata=()=>{ item.duration=vid.duration;
-      document.getElementById("meta-"+item.id).textContent=
-        formatBytes(item.size)+" · "+formatTime(item.duration);
-      document.getElementById("aduration-"+item.id).textContent=
-        "Dur: "+formatMS(item.duration);
-      res();
-    };
-  });
-}
-
-function handleAction(a,target){
-  const vid=document.getElementById("video-"+target.id);
-  const startInput=document.getElementById("start-"+target.id);
-  const endInput=document.getElementById("end-"+target.id);
-
-  if(a==="play") vid.play();
-  if(a==="pause") vid.pause();
-
-  if(a==="setStart"){
-    target.tmpStart=vid.currentTime;
-    startInput.value=formatMS(vid.currentTime);
-  }
-  if(a==="setEnd"){
-    if(target.tmpStart==null){alert("Set Start first");return;}
-    if(vid.currentTime<=target.tmpStart){alert("End must be > Start");return;}
-    target.tmpEnd=vid.currentTime;
-    endInput.value=formatMS(vid.currentTime);
-  }
-  if(a==="apply"){
-    const s=startInput.value.trim();
-    const e=endInput.value.trim();
-    if(!s || !e){alert("Please set both Start and End timestamps");return;}
-    const ts=parseTS(s), te=parseTS(e);
-    if(ts==null||te==null||te<=ts){alert("Invalid timestamps");return;}
-    target.clips.push({start:ts,end:te});
-    startInput.value='';
-    endInput.value='';
-    target.tmpStart=null;
-    target.tmpEnd=null;
-    renderClips(target);
-  }
-  if(a==="remove"){
-    videos=videos.filter(v=>v.id!==target.id);
-    const node=document.getElementById("card-"+target.id);
-    if(node) node.remove();
-    URL.revokeObjectURL(target.url);
-    status.textContent=`${videos.length} video(s) loaded.`;
-  }
-}
-
-function renderClips(t){
-  const el=document.getElementById("clips-"+t.id);
-  if(!t.clips.length){el.textContent="No clips.";return;}
-  el.innerHTML="";
-  t.clips.forEach((c,i)=>{
-    const duration=c.end-c.start;
-    const d=document.createElement("div");
-    d.className="clip-item";
-    d.id=`clip-item-${t.id}-${i}`;
-    d.innerHTML=`
-      <div class="clip-text">Clip ${i+1}: ${formatMS(c.start)} → ${formatMS(c.end)} (${formatMS(duration)})</div>
-      <div class="clip-actions">
-        <button class="small btn" onclick="playClip('${t.id}',${c.start},${c.end})">Play</button>
-        <button class="small btn" onclick="editClipInline('${t.id}',${i})">Edit</button>
-        <button class="small btn" onclick="downloadClipBrowser('${t.id}',${i})">Download</button>
-        <button class="small btn ghost" onclick="deleteClip('${t.id}',${i})">Delete</button>
-      </div>
-    `;
-    el.appendChild(d);
-  });
-}
-
-window.playClip=function(id,s,e){
-  const vid=document.getElementById("video-"+id);
-  pauseAllExcept(id);
-  vid.currentTime=s;
-  vid.play();
-  const fn=()=>{if(vid.currentTime>=e){vid.pause();vid.removeEventListener("timeupdate",fn);}};
-  vid.addEventListener("timeupdate",fn);
-};
-
-window.editClipInline=function(id,i){
-  const v=videos.find(x=>x.id===id);
-  const clip=v.clips[i];
-  const clipItem=document.getElementById(`clip-item-${id}-${i}`);
-  
-  // Clear any existing edit mode
-  document.querySelectorAll('.clip-item.editing').forEach(el=>{
-    if(el.id!==`clip-item-${id}-${i}`){
-      const parts=el.id.split('-');
-      const oldId=parts[2];
-      const oldIndex=parseInt(parts[3]);
-      const oldVideo=videos.find(x=>x.id===oldId);
-      renderClips(oldVideo);
-    }
-  });
-  
-  clipItem.className="clip-item editing";
-  clipItem.innerHTML=`
-    <div style="display:flex;flex-direction:column;gap:6px;flex:1">
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-        <label style="font-size:12px">Start:</label>
-        <input id="edit-start-${id}-${i}" value="${formatMS(clip.start)}" style="width:85px;padding:4px;border-radius:6px;border:1px solid #06b6d4;background:#112;color:#eef;font-size:12px">
-        <label style="font-size:12px">End:</label>
-        <input id="edit-end-${id}-${i}" value="${formatMS(clip.end)}" style="width:85px;padding:4px;border-radius:6px;border:1px solid #06b6d4;background:#112;color:#eef;font-size:12px">
-      </div>
-    </div>
-    <div class="clip-actions">
-      <button class="small btn" onclick="saveClipEdit('${id}',${i})">Save</button>
-      <button class="small btn ghost" onclick="cancelClipEdit('${id}')">Cancel</button>
-    </div>
-  `;
-};
-
-window.saveClipEdit=function(id,i){
-  const v=videos.find(x=>x.id===id);
-  const startInput=document.getElementById(`edit-start-${id}-${i}`);
-  const endInput=document.getElementById(`edit-end-${id}-${i}`);
-  
-  const s=startInput.value.trim();
-  const e=endInput.value.trim();
-  const ts=parseTS(s), te=parseTS(e);
-  
-  if(ts==null||te==null||te<=ts){
-    alert("Invalid timestamps. End must be greater than Start.");
-    return;
-  }
-  
-  v.clips[i]={start:ts,end:te};
-  renderClips(v);
-};
-
-window.cancelClipEdit=function(id){
-  const v=videos.find(x=>x.id===id);
-  renderClips(v);
-};
-
-window.editClip=function(id,i){
-  editClipInline(id,i);
-};
-
-window.deleteClip=function(id,i){
-  const v=videos.find(x=>x.id===id);
-  v.clips.splice(i,1);
-  renderClips(v);
-};
-
-// Browser-based clip download using MediaRecorder (unchanged)
-window.downloadClipBrowser=async function(id,i){
-  const v=videos.find(x=>x.id===id);
-  const clip=v.clips[i];
-  
-  status.textContent="Preparing clip for download...";
-  showProgress(10);
-  
-  try {
-    // Create a hidden video element for recording
-    const videoEl=document.createElement('video');
-    videoEl.src=v.url;
-    videoEl.muted=true;
-    videoEl.style.display='none';
-    document.body.appendChild(videoEl);
-    
-    await new Promise(res=>videoEl.onloadedmetadata=res);
-    
-    showProgress(20);
-    
-    // Create canvas for capture
-    const canvas=document.createElement('canvas');
-    canvas.width=videoEl.videoWidth;
-    canvas.height=videoEl.videoHeight;
-    const ctx=canvas.getContext('2d');
-    
-    // We'll use requestVideoFrameCallback when available for accurate frames
-    const stream=canvas.captureStream(30);
-    
-    // Add audio track if available
-    let audioTrack=null;
-    if(videoEl.captureStream){
-      try {
-        const videoStream=videoEl.captureStream();
-        const audioTracks=videoStream.getAudioTracks();
-        if(audioTracks.length>0){
-          audioTrack=audioTracks[0];
-          stream.addTrack(audioTrack);
-        }
-      } catch(e){
-        // ignore
-      }
-    }
-    
-    const recorder=new MediaRecorder(stream,{
-      mimeType:'video/webm;codecs=vp9,opus',
-      videoBitsPerSecond:2500000
-    });
-    
-    const chunks=[];
-    recorder.ondataavailable=e=>chunks.push(e.data);
-    
-    recorder.onstop=()=>{
-      const blob=new Blob(chunks,{type:'video/webm'});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;
-      a.download=`${v.title.replace(/\.[^/.]+$/,"")}_clip${i+1}.webm`;
-      a.click();
-      URL.revokeObjectURL(url);
-      if(videoEl && videoEl.parentNode) document.body.removeChild(videoEl);
-      showProgress(100);
-      setTimeout(()=>{ document.getElementById("progressContainer").style.display="none"; },1000);
-      status.textContent="Clip downloaded successfully (WebM format).";
-    };
-    
-    showProgress(30);
-    
-    // Start recording
-    recorder.start();
-    videoEl.currentTime=clip.start;
-    await waitForSeek(videoEl);
-    await videoEl.play();
-    
-    const duration=clip.end-clip.start;
-    const startTime=performance.now();
-    
-    // Draw frames by video frame callback when available
-    const drawFrame = (now, metadata) => {
-      ctx.drawImage(videoEl,0,0,canvas.width,canvas.height);
-      const progress=30 + ((videoEl.currentTime-clip.start)/duration)*60;
-      updateProgress(progress);
-    };
-    
-    if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
-      // accurate approach
-      const onFrame = (now, metadata) => {
-        drawFrame(now,metadata);
-        if (videoEl.currentTime >= clip.end) {
-          recorder.stop();
-          videoEl.pause();
-          return;
-        }
-        videoEl.requestVideoFrameCallback(onFrame);
-      };
-      videoEl.requestVideoFrameCallback(onFrame);
-    } else {
-      // fallback
-      const fps = 30;
-      const interval = 1000 / fps;
-      const timer = setInterval(()=>{
-        if (videoEl.currentTime >= clip.end) {
-          clearInterval(timer);
-          recorder.stop();
-          videoEl.pause();
-          return;
-        }
-        drawFrame();
-      }, interval);
-    }
-    
-  } catch(err) {
-    console.error("Download error:",err);
-    alert("Browser-based download failed. Please try using 'Export All' with FFmpeg for better compatibility.\n\nError: "+err.message);
-    status.textContent="Download failed. Try Export All instead.";
-    document.getElementById("progressContainer").style.display="none";
-  }
-};
-
-cancelEdit.addEventListener("click",()=>{
-  editModal.style.display="none";
-  editingClip=null;
 });
 
-saveEdit.addEventListener("click",()=>{
-  if(!editingClip) return;
-  const s=editStart.value.trim();
-  const e=editEnd.value.trim();
-  const ts=parseTS(s), te=parseTS(e);
-  if(ts==null||te==null||te<=ts){alert("Invalid timestamps");return;}
-  
-  const v=videos.find(x=>x.id===editingClip.videoId);
-  v.clips[editingClip.clipIndex]={start:ts,end:te};
-  renderClips(v);
-  editModal.style.display="none";
-  editingClip=null;
+card.querySelector('.markStart')
+.addEventListener(
+'click',
+()=>{
+
+startInput.value =
+formatTime(video.currentTime);
+
 });
 
-function formatBytes(b){return (b/1024/1024).toFixed(2)+" MB";}
-function pad(n){return String(n).padStart(2,"0");}
+card.querySelector('.markEnd')
+.addEventListener(
+'click',
+()=>{
 
-function formatTime(t){
-  const m=Math.floor(t/60),s=Math.floor(t%60);
-  return pad(m)+":"+pad(s);
-}
+endInput.value =
+formatTime(video.currentTime);
 
-function formatMS(t){
-  const m=Math.floor(t/60),s=Math.floor(t%60);
-  const ms=Math.floor((t-Math.floor(t))*1000);
-  return `${pad(m)}:${pad(s)}.${String(ms).padStart(3,'0')}`;
-}
-
-function parseTS(str){
-  const m=str.match(/^(\d+):(\d+)\.(\d+)$/);
-  if(!m) return null;
-  return (+m[1])*60 + (+m[2]) + (+m[3])/1000;
-}
-
-function showProgress(p){
-  document.getElementById("progressContainer").style.display="block";
-  updateProgress(p);
-}
-function updateProgress(p){
-  document.getElementById("progressBar").style.width=Math.min(100,p)+"%";
-}
-
-let ffmpeg=null;
-
-/*
-  Improved Export All (Merge)
-  - Uses requestVideoFrameCallback (if available) to draw frames exactly when the browser has a new video frame.
-  - Keeps video's original aspect ratio while rendering into canvas (letterbox/pillarbox if needed).
-  - Attaches original audio track for each clip to the canvas stream, and removes it after clip done.
-  - Records a single MediaRecorder session for all clips to produce one merged WebM file and an SRT.
-*/
-exportBtn.addEventListener("click",async()=>{
-  const clipsWithDetails=collectClipsWithDetails();
-  if(!clipsWithDetails.length){alert("No clips to export");return;}
-
-  exportBtn.disabled=true;
-  exportBtn.textContent="Preparing export...";
-  showProgress(5);
-
-  try {
-    status.textContent="Creating merged video...";
-
-    // Pause all videos
-    videos.forEach(v=>{
-      const vid=document.getElementById("video-"+v.id);
-      if(vid && !vid.paused) vid.pause();
-    });
-
-    showProgress(10);
-
-    // Create a canvas sized to the maximum natural dimensions while preserving ratio per clip.
-    let maxW=0,maxH=0;
-    for(const v of videos){
-      const vid=document.getElementById("video-"+v.id);
-      maxW=Math.max(maxW, vid.videoWidth || 1280);
-      maxH=Math.max(maxH, vid.videoHeight || 720);
-    }
-    if(maxW===0) { maxW=1280; maxH=720; }
-
-    const canvas=document.createElement('canvas');
-    canvas.width=maxW;
-    canvas.height=maxH;
-    const ctx=canvas.getContext('2d');
-
-    showProgress(15);
-
-    // Create a stream and recorder (we'll add/remove audio tracks per clip)
-    const stream=canvas.captureStream(30);
-    const mimeHint = (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) ? 'video/webm;codecs=vp9,opus' : 'video/webm';
-    // In downloadClipBrowser and downloadSingleClip functions, change MediaRecorder options:
-const recorder = new MediaRecorder(stream, {
-    mimeType: 'video/webm;codecs=vp9',           // or try 'video/webm;codecs=vp8'
-    videoBitsPerSecond: 8000000,                 // Increase to 8–20 Mbps
-    // audioBitsPerSecond: 192000
-});
-    const chunks=[];
-    recorder.ondataavailable = e => chunks.push(e.data);
-
-    // Build SRT content
-    let srtContent='';
-    let srtIndex=1;
-    let currentTime=0;
-    for(const c of clipsWithDetails){
-      const duration=c.end-c.start;
-      const startSrt=formatSRT(currentTime);
-      const endSrt=formatSRT(currentTime+duration);
-      srtContent+=`${srtIndex}\n${startSrt} --> ${endSrt}\n${c.videoTitle} - Clip ${c.clipIndex+1}: ${formatMS(c.start)} → ${formatMS(c.end)}\n\n`;
-      srtIndex++;
-      currentTime+=duration;
-    }
-
-    recorder.onstop = ()=>{
-      const videoBlob = new Blob(chunks, { type: 'video/webm' });
-      const videoUrl = URL.createObjectURL(videoBlob);
-
-      // Download merged video
-      const videoLink=document.createElement('a');
-      videoLink.href=videoUrl;
-      videoLink.download='merged_video.webm';
-      videoLink.click();
-
-      // Download SRT
-      const srtBlob=new Blob([srtContent],{type:'text/plain;charset=utf-8'});
-      const srtUrl=URL.createObjectURL(srtBlob);
-      const srtLink=document.createElement('a');
-      srtLink.href=srtUrl;
-      srtLink.download='merged_video.srt';
-      srtLink.click();
-
-      setTimeout(()=>{ URL.revokeObjectURL(videoUrl); URL.revokeObjectURL(srtUrl); },1000);
-
-      showProgress(100);
-      setTimeout(()=>{ document.getElementById("progressContainer").style.display="none"; },1500);
-      status.textContent="Export completed! Video and SRT downloaded.";
-      exportBtn.disabled=false;
-      exportBtn.textContent="Export All (Merge)";
-    };
-
-    // Start single recording session
-    recorder.start();
-    showProgress(20);
-
-    // Helper to draw with aspect fit into canvas
-    function drawAspectFit(videoEl){
-      ctx.fillStyle = 'black';
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-      const vw = videoEl.videoWidth;
-      const vh = videoEl.videoHeight;
-      if(!vw || !vh) return;
-      const videoRatio = vw / vh;
-      const canvasRatio = canvas.width / canvas.height;
-      let dw, dh, dx, dy;
-      if(videoRatio > canvasRatio){
-        // video is wider -> full width
-        dw = canvas.width;
-        dh = Math.round(canvas.width / videoRatio);
-        dx = 0;
-        dy = Math.round((canvas.height - dh)/2);
-      } else {
-        // video is taller -> full height
-        dh = canvas.height;
-        dw = Math.round(canvas.height * videoRatio);
-        dy = 0;
-        dx = Math.round((canvas.width - dw)/2);
-      }
-      ctx.drawImage(videoEl, 0, 0, vw, vh, dx, dy, dw, dh);
-    }
-
-    // Process each clip in sequence
-    for(let i=0;i<clipsWithDetails.length;i++){
-      const c=clipsWithDetails[i];
-      const videoEl=document.getElementById("video-"+c.videoId);
-      status.textContent=`Processing clip ${i+1}/${clipsWithDetails.length}...`;
-
-      // Ensure muted during canvas rendering (audio comes from captureStream track)
-      videoEl.muted=true;
-      videoEl.pause();
-      videoEl.currentTime = c.start;
-      await waitForSeek(videoEl);
-
-      // Get audio track for this video (if available)
-      let audioTrack=null;
-      try {
-        if(videoEl.captureStream){
-          const mediaStream = videoEl.captureStream();
-          const tracks = mediaStream.getAudioTracks();
-          if(tracks.length>0){
-            audioTrack = tracks[0];
-            // add audio to canvas stream so MediaRecorder records both
-            try { stream.addTrack(audioTrack); } catch(e){ console.warn('addTrack failed',e); }
-          }
-        }
-      } catch(e){
-        console.warn("audio capture not available for clip", i, e);
-      }
-
-      // Play and draw frames as they arrive
-      await videoEl.play().catch(()=>{ /* ignore play errors */ });
-
-      // Use requestVideoFrameCallback when supported for accurate frame timing
-      const duration = c.end - c.start;
-      const clipStartTime = performance.now();
-
-      const framePromise = new Promise(resolveFrame=>{
-        let stopped=false;
-
-        const cleanupAndResolve = ()=>{
-          if(stopped) return;
-          stopped=true;
-          // remove audio track for this clip if we added it
-          if(audioTrack){
-            try { stream.removeTrack(audioTrack); } catch(e){ /* ignore */ }
-          }
-          // small pause to ensure last frames flush into recorder
-          setTimeout(()=>resolveFrame(), 50);
-        };
-
-        if ('requestVideoFrameCallback' in HTMLVideoElement.prototype ) {
-          const onFrame = (now, metadata) => {
-            // draw the frame
-            drawAspectFit(videoEl);
-
-            // progress update (scaled between 20 and 95)
-            const clipProgress = (i + ((videoEl.currentTime - c.start)/duration)) / clipsWithDetails.length;
-            const prog = 20 + clipProgress * 75;
-            updateProgress(prog);
-
-            if (videoEl.currentTime + 0.03 >= c.end || videoEl.ended) {
-              // reached clip end
-              videoEl.pause();
-              cleanupAndResolve();
-              return;
-            }
-            videoEl.requestVideoFrameCallback(onFrame);
-          };
-          videoEl.requestVideoFrameCallback(onFrame);
-        } else {
-          // fallback: draw at ~30fps
-          const fps=30;
-          const interval = 1000 / fps;
-          const timer = setInterval(()=>{
-            drawAspectFit(videoEl);
-            const clipProgress = (i + ((videoEl.currentTime - c.start)/duration)) / clipsWithDetails.length;
-            const prog = 20 + clipProgress * 75;
-            updateProgress(prog);
-
-            if (videoEl.currentTime + 0.03 >= c.end || videoEl.ended) {
-              clearInterval(timer);
-              videoEl.pause();
-              cleanupAndResolve();
-            }
-          }, interval);
-        }
-      });
-
-      await framePromise;
-
-      // ensure small gap to let audio track finish
-      await new Promise(r=>setTimeout(r,80));
-      videoEl.muted=false;
-      await new Promise(r=>setTimeout(r,120));
-    }
-
-    // finalize
-    showProgress(98);
-    status.textContent="Finalizing video...";
-    recorder.stop();
-
-  } catch(err) {
-    console.error("Export error:",err);
-    alert("Export error: "+err.message);
-    status.textContent="Export failed.";
-    document.getElementById("progressContainer").style.display="none";
-    exportBtn.disabled=false;
-    exportBtn.textContent="Export All (Merge)";
-  }
 });
 
-function formatSRT(seconds){
-  const h=Math.floor(seconds/3600);
-  const m=Math.floor((seconds%3600)/60);
-  const s=Math.floor(seconds%60);
-  const ms=Math.floor((seconds%1)*1000);
-  return `${pad(h)}:${pad(m)}:${pad(s)},${String(ms).padStart(3,'0')}`;
+card.querySelector('.addClip')
+.addEventListener(
+'click',
+()=>{
+
+if(
+!startInput.value ||
+!endInput.value
+){
+alert('Mark start and end');
+return;
 }
 
-function collectClips(){
-  const all=[];
-  for(const v of videos){
-    for(const c of v.clips)
-      all.push({videoId:v.id,start:c.start,end:c.end});
-  }
-  return all;
-}
+const clip = {
+start:startInput.value,
+end:endInput.value,
+video:videoData
+};
 
-function collectClipsWithDetails(){
-  const all=[];
-  for(const v of videos){
-    for(let i=0;i<v.clips.length;i++){
-      const c=v.clips[i];
-      all.push({
-        videoId:v.id,
-        start:c.start,
-        end:c.end,
-        videoTitle:v.title,
-        clipIndex:i
-      });
-    }
-  }
-  return all;
-}
+videoData.clips.push(clip);
 
-downloadAllBtn.addEventListener("click",async()=>{
-  const clipsWithDetails=collectClipsWithDetails();
-  if(!clipsWithDetails.length){alert("No clips to download");return;}
+renderClips();
 
-  downloadAllBtn.disabled=true;
-  downloadAllBtn.textContent="Downloading...";
-  showProgress(0);
-
-  try {
-    for(let i=0;i<clipsWithDetails.length;i++){
-      const c=clipsWithDetails[i];
-      const v=videos.find(x=>x.id===c.videoId);
-      
-      status.textContent=`Downloading clip ${i+1}/${clipsWithDetails.length}...`;
-      updateProgress((i/clipsWithDetails.length)*100);
-      
-      await downloadSingleClip(v,c.clipIndex,c.start,c.end);
-      
-      // Wait between downloads
-      await new Promise(r=>setTimeout(r,500));
-    }
-
-    updateProgress(100);
-    setTimeout(()=>{ document.getElementById("progressContainer").style.display="none"; },1000);
-    status.textContent=`All ${clipsWithDetails.length} clips downloaded successfully!`;
-    downloadAllBtn.disabled=false;
-    downloadAllBtn.textContent="Download All Clips";
-  } catch(err) {
-    console.error("Download all error:",err);
-    alert("Error downloading clips: "+err.message);
-    status.textContent="Download failed.";
-    document.getElementById("progressContainer").style.display="none";
-    downloadAllBtn.disabled=false;
-    downloadAllBtn.textContent="Download All Clips";
-  }
 });
 
-async function downloadSingleClip(v,clipIndex,start,end){
-  return new Promise(async(resolve,reject)=>{
-    try {
-      // Create a hidden video element for recording
-      const videoEl=document.createElement('video');
-      videoEl.src=v.url;
-      videoEl.muted=true;
-      videoEl.style.display='none';
-      document.body.appendChild(videoEl);
-      
-      await new Promise(res=>videoEl.onloadedmetadata=res);
-      
-      // Create canvas for capture
-      const canvas=document.createElement('canvas');
-      canvas.width=videoEl.videoWidth;
-      canvas.height=videoEl.videoHeight;
-      const ctx=canvas.getContext('2d');
-      
-      // Create MediaStream from canvas
-      const stream=canvas.captureStream(30);
-      
-      // Add audio track if available
-      if(videoEl.captureStream){
-        const videoStream=videoEl.captureStream();
-        const audioTracks=videoStream.getAudioTracks();
-        if(audioTracks.length>0){
-          stream.addTrack(audioTracks[0]);
-        }
-      }
-      
-      const recorder=new MediaRecorder(stream,{
-        mimeType:'video/webm;codecs=vp9',
-        videoBitsPerSecond:2500000
-      });
-      
-      const chunks=[];
-      recorder.ondataavailable=e=>chunks.push(e.data);
-      
-      recorder.onstop=()=>{
-        const blob=new Blob(chunks,{type:'video/webm'});
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement('a');
-        a.href=url;
-        a.download=`${v.title.replace(/\.[^/.]+$/,"")}_clip${clipIndex+1}.webm`;
-        a.click();
-        URL.revokeObjectURL(url);
-        if(videoEl && videoEl.parentNode) document.body.removeChild(videoEl);
-        resolve();
-      };
-      
-      // Start recording
-      recorder.start();
-      videoEl.currentTime=start;
-      await waitForSeek(videoEl);
-      await videoEl.play();
-      
-      const duration=end-start;
-      const startTime=Date.now();
-      
-      // Use requestVideoFrameCallback when available for accurate frames
-      if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
-        const onFrame = () => {
-          ctx.drawImage(videoEl,0,0,canvas.width,canvas.height);
-          if(videoEl.currentTime>=end || Date.now()-startTime>=duration*1000+500){
-            recorder.stop();
-            videoEl.pause();
-            return;
-          }
-          videoEl.requestVideoFrameCallback(onFrame);
-        };
-        videoEl.requestVideoFrameCallback(onFrame);
-      } else {
-        const fps = 30;
-        const interval = 1000 / fps;
-        const timer = setInterval(()=>{
-          if(videoEl.currentTime>=end || Date.now()-startTime>=duration*1000+500){
-            clearInterval(timer);
-            recorder.stop();
-            videoEl.pause();
-            return;
-          }
-          ctx.drawImage(videoEl,0,0,canvas.width,canvas.height);
-        }, interval);
-      }
-      
-    } catch(err) {
-      reject(err);
-    }
-  });
+card.querySelector('.exportVideo')
+.addEventListener(
+'click',
+async()=>{
+
+if(!videoData.clips.length){
+alert('No clips');
+return;
 }
 
-clearBtn.addEventListener("click",()=>{
-  if(!videos.length) return;
-  if(!confirm("Clear all videos and clips?")) return;
-  videos.forEach(v=>{
-    const vid=document.getElementById("video-"+v.id);
-    if(vid) vid.pause();
-    URL.revokeObjectURL(v.url);
-  });
-  videos=[];
-  grid.innerHTML="";
-  status.textContent="Cleared all videos.";
-  document.getElementById("progressContainer").style.display="none";
+await exportClips(videoData);
+
 });
 
+function renderClips(){
 
-// helper: wait for seeking to finish
-function waitForSeek(videoEl, timeout=3000){
-  return new Promise((resolve, reject) => {
-    const onSeeked = () => {
-      cleanup();
-      resolve();
-    };
-    const onError = () => {
-      cleanup();
-      resolve(); // still resolve; we'll try playing
-    };
-    const cleanup = () => {
-      videoEl.removeEventListener('seeked', onSeeked);
-      videoEl.removeEventListener('error', onError);
-    };
-    videoEl.addEventListener('seeked', onSeeked);
-    videoEl.addEventListener('error', onError);
-    // fallback timeout
-    setTimeout(()=>{ cleanup(); resolve(); }, timeout);
-  });
+clipsList.innerHTML = '';
+
+videoData.clips.forEach(
+(clip,index)=>{
+
+const div =
+document.createElement('div');
+
+div.className =
+'clip-item';
+
+div.innerHTML = `
+
+<div class="clip-text">
+Clip ${index + 1}
+<br>
+${clip.start} → ${clip.end}
+</div>
+
+<div class="clip-actions">
+
+<button class="btn small download">
+Download
+</button>
+
+<button class="btn small delete">
+Delete
+</button>
+
+</div>
+`;
+
+clipsList.appendChild(div);
+
+div.querySelector('.delete')
+.addEventListener(
+'click',
+()=>{
+
+videoData.clips.splice(index,1);
+
+renderClips();
+
+});
+
+div.querySelector('.download')
+.addEventListener(
+'click',
+async()=>{
+
+await exportSingleClip(
+videoData,
+clip,
+index
+);
+
+});
+
+});
+
 }
+
+}
+
+async function exportSingleClip(
+videoData,
+clip,
+index
+){
+
+await loadFFmpeg();
+
+const inputName =
+`${videoData.id}.mp4`;
+
+const outputName =
+`clip_${index + 1}.mp4`;
+
+ffmpeg.FS(
+'writeFile',
+inputName,
+await fetchFile(videoData.file)
+);
+
+await ffmpeg.run(
+'-ss',
+clip.start,
+'-to',
+clip.end,
+'-i',
+inputName,
+'-c',
+'copy',
+outputName
+);
+
+const data =
+ffmpeg.FS(
+'readFile',
+outputName
+);
+
+const blob =
+new Blob(
+[data.buffer],
+{ type:'video/mp4' }
+);
+
+const url =
+URL.createObjectURL(blob);
+
+const a =
+document.createElement('a');
+
+a.href = url;
+
+a.download = outputName;
+
+a.click();
+
+allClips.push(blob);
+
+}
+
+async function exportClips(videoData){
+
+for(
+let i=0;
+i<videoData.clips.length;
+i++
+){
+
+await exportSingleClip(
+videoData,
+videoData.clips[i],
+i
+);
+
+}
+
+}
+
+downloadAllBtn.addEventListener(
+'click',
+async()=>{
+
+if(!videos.length){
+alert('No videos');
+return;
+}
+
+for(const v of videos){
+
+await exportClips(v);
+
+}
+
+});
+
+exportBtn.addEventListener(
+'click',
+async()=>{
+
+if(videos.length < 2){
+alert('Add minimum 2 videos');
+return;
+}
+
+await loadFFmpeg();
+
+const inputFiles = [];
+
+for(
+let i=0;
+i<videos.length;
+i++
+){
+
+const name =
+`input${i}.mp4`;
+
+ffmpeg.FS(
+'writeFile',
+name,
+await fetchFile(videos[i].file)
+);
+
+inputFiles.push(name);
+
+}
+
+let filter = '';
+
+for(
+let i=0;
+i<inputFiles.length;
+i++
+){
+
+filter +=
+`[${i}:v][${i}:a]`;
+
+}
+
+filter +=
+`concat=n=${inputFiles.length}:v=1:a=1[outv][outa]`;
+
+const args = [];
+
+inputFiles.forEach(f=>{
+
+args.push('-i',f);
+
+});
+
+args.push(
+'-filter_complex',
+filter,
+'-map',
+'[outv]',
+'-map',
+'[outa]',
+'merged.mp4'
+);
+
+await ffmpeg.run(...args);
+
+const data =
+ffmpeg.FS(
+'readFile',
+'merged.mp4'
+);
+
+const blob =
+new Blob(
+[data.buffer],
+{ type:'video/mp4' }
+);
+
+const url =
+URL.createObjectURL(blob);
+
+const a =
+document.createElement('a');
+
+a.href = url;
+
+a.download = 'merged.mp4';
+
+a.click();
+
+});
+
+clearBtn.addEventListener(
+'click',
+()=>{
+
+videos = [];
+
+allClips = [];
+
+grid.innerHTML = '';
+
+statusEl.textContent =
+'No videos loaded.';
+
+progressBar.style.width =
+'0%';
+
+progressContainer.style.display =
+'none';
+
+});
 
 </script>
 
