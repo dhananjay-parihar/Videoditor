@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Browser Video Editor</title>
+
+<style>
+:root{
+--bg:#0f172a;
+--card:#0b1220;
+--muted:#94a3b8;
+--accent:#06b6d4;
+--glass:rgba(255,255,255,0.03)
+}
+
+html,body{
+height:100%;
+margin:0;
+font-family:Inter,system-ui,Arial;
+color:#e6eef6;
+background:#071526
+}
+
+.app{
+height:100vh;
+display:flex;
+flex-direction:column;
+gap:12px;
+padding:14px;
+box-sizing:border-box
+}
+
+header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+flex-wrap:wrap;
+gap:10px
+}
+
+h1{
+margin:0;
+font-size:18px
+}
+
+.btn{
+background:#1e293b;
+border:1px solid #334;
+padding:8px 12px;
+border-radius:10px;
+color:#e6eef6;
+cursor:pointer;
+font-family:inherit
+}
+
+.btn:disabled{
+opacity:0.5;
+cursor:not-allowed
+}
+
+.btn.ghost{
+background:transparent;
+border:1px dashed #334
+}
+
+main{
+flex:1;
+overflow:auto;
+padding:10px;
+background:rgba(255,255,255,0.03);
+border-radius:10px
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr;
+gap:12px
+}
+
+.card{
+background:#0b1220;
+padding:10px;
+border-radius:10px;
+display:flex;
+flex-direction:row;
+gap:12px;
+border:1px solid #1a2536
+}
+
+.video-section{
+flex:1;
+display:flex;
+flex-direction:column;
+gap:8px
+}
+
+.controls-section{
+flex:1;
+display:flex;
+flex-direction:column;
+gap:8px
+}
+
+.video-frame{
+height:100%;
+min-height:400px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#111;
+border-radius:8px;
+overflow:hidden
+}
+
+.video-frame video{
+max-width:100%;
+max-height:100%;
+object-fit:contain
+}
+
+@media (max-width:768px){
+
+.app{
+padding:8px;
+gap:8px
+}
+
+header{
+flex-direction:column;
+align-items:stretch
+}
+
+h1{
+font-size:16px;
+text-align:center
+}
+
+.grid{
+gap:8px
+}
+
+.card{
+flex-direction:column;
+padding:8px;
+gap:8px
+}
+
+.video-section{
+width:100%
+}
+
+.controls-section{
+width:100%
+}
+
+.video-frame{
+min-height:200px;
+height:auto
+}
+
+.actions{
+justify-content:center
+}
+
+.clip-actions{
+justify-content:center;
+flex-wrap:wrap
+}
+
+.inrow{
+justify-content:center
+}
+
+.btn{
+font-size:13px;
+padding:6px 10px
+}
+
+.small{
+font-size:12px;
+padding:3px 6px
+}
+
+.notice{
+font-size:11px;
+padding:6px 8px
+}
+
+main{
+padding:8px
+}
+
+footer{
+flex-direction:column;
+gap:6px;
+font-size:12px
+}
+}
+
+.meta{
+display:flex;
+justify-content:space-between;
+font-size:13px;
+color:#94a3b8
+}
+
+.actions{
+display:flex;
+flex-wrap:wrap;
+gap:6px
+}
+
+.small{
+font-size:13px;
+padding:4px 7px
+}
+
+.timestampBar{
+font-size:12px;
+color:#cde1ff;
+display:flex;
+justify-content:space-between
+}
+
+.inrow{
+display:flex;
+gap:6px;
+align-items:center;
+flex-wrap:wrap
+}
+
+.inrow input{
+width:85px;
+padding:4px;
+border-radius:6px;
+border:1px solid #334;
+background:#112;
+color:#eef;
+font-size:12px
+}
+
+.clips-list{
+background:#111;
+padding:6px;
+border-radius:6px;
+font-size:13px;
+max-height:180px;
+overflow:auto
+}
+
+.clip-item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:6px;
+margin:4px 0;
+background:#1a2536;
+border-radius:4px;
+gap:6px;
+flex-wrap:wrap
+}
+
+.clip-text{
+flex:1;
+min-width:150px
+}
+
+.clip-actions{
+display:flex;
+gap:4px;
+flex-wrap:wrap
+}
+
+#progressContainer{
+width:100%;
+height:6px;
+background:#1e293b;
+border-radius:4px;
+overflow:hidden;
+display:none
+}
+
+#progressBar{
+height:100%;
+width:0%;
+background:#06b6d4;
+transition:width .25s
+}
+
+.notice{
+background:#334;
+padding:8px 12px;
+border-radius:6px;
+font-size:12px;
+color:#ffd700;
+margin-top:8px
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<header>
+<h1>Browser Video Editor</h1>
+
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+<label for="files" class="btn">Select Videos</label>
+
+<input
+id="files"
+type="file"
+multiple
+accept="video/*"
+style="display:none"
+>
+
+<button id="exportBtn" class="btn">
+Export All (Merge)
+</button>
+
+<button id="downloadAllBtn" class="btn">
+Download All Clips
+</button>
+
+<button id="clearBtn" class="btn ghost">
+Clear All
+</button>
+</div>
+</header>
+
+<div id="progressContainer">
+<div id="progressBar"></div>
+</div>
+
+<main>
+<div id="grid" class="grid"></div>
+</main>
+
+<footer style="display:flex;gap:10px;flex-wrap:wrap">
+<div id="status" style="font-size:13px;color:#94a3b8">
+No videos loaded.
+</div>
+
+<div
+style="margin-left:auto;font-size:13px;color:#94a3b8"
+id="ffmpegStatus"
+>
+FFmpeg: Not loaded
+</div>
+</footer>
+
+</div>
+
+<script type="module">
+
+import {
+FFmpeg
+} from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
+
+import {
+fetchFile,
+toBlobURL
+} from 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js';
+
+const filesInput = document.getElementById('files');
+const grid = document.getElementById('grid');
+const statusEl = document.getElementById('status');
+const ffmpegStatus = document.getElementById('ffmpegStatus');
+const progressContainer = document.getElementById('progressContainer');
+const progressBar = document.getElementById('progressBar');
+
+const exportBtn = document.getElementById('exportBtn');
+const downloadAllBtn = document.getElementById('downloadAllBtn');
+const clearBtn = document.getElementById('clearBtn');
+
+let ffmpeg;
+let videos = [];
+let allClips = [];
+
+async function loadFFmpeg(){
+
+if(ffmpeg) return ffmpeg;
+
+ffmpegStatus.textContent = 'FFmpeg: Loading...';
+
+ffmpeg = new FFmpeg();
+
+ffmpeg.on('progress', ({ progress })=>{
+
+progressContainer.style.display = 'block';
+
+progressBar.style.width =
+`${Math.round(progress * 100)}%`;
+
+});
+
+const baseURL =
+'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
+
+await ffmpeg.load({
+
+coreURL: await toBlobURL(
+`${baseURL}/ffmpeg-core.js`,
+'text/javascript'
+),
+
+wasmURL: await toBlobURL(
+`${baseURL}/ffmpeg-core.wasm`,
+'application/wasm'
+),
+
+workerURL: await toBlobURL(
+`${baseURL}/ffmpeg-core.worker.js`,
+'text/javascript'
+)
+
+});
+
+ffmpegStatus.textContent = 'FFmpeg: Loaded';
+
+return ffmpeg;
+}
+
+function formatTime(sec){
+
+sec = Math.max(sec,0);
+
+const m = Math.floor(sec / 60);
+const s = Math.floor(sec % 60);
+const ms = Math.floor((sec % 1) * 1000);
+
+return `${m}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
+}
+
+filesInput.addEventListener('change', async(e)=>{
+
+const files = [...e.target.files];
+
+if(!files.length) return;
+
+statusEl.textContent =
+`${files.length} video(s) loaded`;
+
+for(const file of files){
+
+const url = URL.createObjectURL(file);
+
+const id =
+Date.now() + Math.random();
+
+videos.push({
+id,
+file,
+url,
+clips:[]
+});
+
+renderVideo(videos[videos.length - 1]);
+}
+});
+
+function renderVideo(videoData){
+
+const card = document.createElement('div');
+
+card.className = 'card';
+
+card.innerHTML = `
+
+<div class="video-section">
+
+<div class="video-frame">
+<video controls src="${videoData.url}"></video>
+</div>
+
+<div class="meta">
+<div>${videoData.file.name}</div>
+<div class="duration">Loading...</div>
+</div>
+
+</div>
+
+<div class="controls-section">
+
+<div class="timestampBar">
+<span class="current">0:00.000</span>
+<span class="total">0:00.000</span>
+</div>
+
+<div class="actions">
+
+<button class="btn small markStart">
+Mark Start
+</button>
+
+<button class="btn small markEnd">
+Mark End
+</button>
+
+<button class="btn small addClip">
+Add Clip
+</button>
+
+<button class="btn small exportVideo">
+Export Clips
+</button>
+
+</div>
+
+<div class="inrow">
+<input class="startInput" placeholder="Start">
+<input class="endInput" placeholder="End">
+</div>
+
+<div class="clips-list"></div>
+
+<div class="notice">
+Use "Mark Start" and "Mark End" while video plays.
+</div>
+
+</div>
+`;
+
+grid.appendChild(card);
+
+const video = card.querySelector('video');
+const durationEl = card.querySelector('.duration');
+const currentEl = card.querySelector('.current');
+const totalEl = card.querySelector('.total');
+
+const startInput =
+card.querySelector('.startInput');
+
+const endInput =
+card.querySelector('.endInput');
+
+const clipsList =
+card.querySelector('.clips-list');
+
+video.addEventListener('loadedmetadata', ()=>{
+
+durationEl.textContent =
+formatTime(video.duration);
+
+totalEl.textContent =
+formatTime(video.duration);
+
+});
+
+video.addEventListener('timeupdate', ()=>{
+
+currentEl.textContent =
+formatTime(video.currentTime);
+
+});
+
+card.querySelector('.markStart')
+.addEventListener('click', ()=>{
+
+startInput.value =
+formatTime(video.currentTime);
+
+});
+
+card.querySelector('.markEnd')
+.addEventListener('click', ()=>{
+
+endInput.value =
+formatTime(video.currentTime);
+
+});
+
+card.querySelector('.addClip')
+.addEventListener('click', ()=>{
+
+if(!startInput.value || !endInput.value){
+alert('Mark start and end');
+return;
+}
+
+const clip = {
+start:startInput.value,
+end:endInput.value,
+video:videoData
+};
+
+videoData.clips.push(clip);
+
+renderClips();
+});
+
+card.querySelector('.exportVideo')
+.addEventListener('click', async()=>{
+
+if(!videoData.clips.length){
+alert('No clips');
+return;
+}
+
+await exportClips(videoData);
+});
+
+function renderClips(){
+
+clipsList.innerHTML = '';
+
+videoData.clips.forEach((clip,index)=>{
+
+const div = document.createElement('div');
+
+div.className = 'clip-item';
+
+div.innerHTML = `
+
+<div class="clip-text">
+Clip ${index + 1}
+<br>
+${clip.start} → ${clip.end}
+</div>
+
+<div class="clip-actions">
+
+<button class="btn small download">
+Download
+</button>
+
+<button class="btn small delete">
+Delete
+</button>
+
+</div>
+`;
+
+clipsList.appendChild(div);
+
+div.querySelector('.delete')
+.addEventListener('click', ()=>{
+
+videoData.clips.splice(index,1);
+
+renderClips();
+});
+
+div.querySelector('.download')
+.addEventListener('click', async()=>{
+
+await exportSingleClip(
+videoData,
+clip,
+index
+);
+
+});
+
+});
+}
+}
+
+async function exportSingleClip(
+videoData,
+clip,
+index
+){
+
+await loadFFmpeg();
+
+const inputName =
+`${videoData.id}.mp4`;
+
+const outputName =
+`clip_${index + 1}.mp4`;
+
+await ffmpeg.writeFile(
+inputName,
+await fetchFile(videoData.file)
+);
+
+await ffmpeg.exec([
+'-ss',
+clip.start,
+'-to',
+clip.end,
+'-i',
+inputName,
+'-c',
+'copy',
+outputName
+]);
+
+const data =
+await ffmpeg.readFile(outputName);
+
+const blob = new Blob(
+[data.buffer],
+{ type:'video/mp4' }
+);
+
+const url =
+URL.createObjectURL(blob);
+
+const a =
+document.createElement('a');
+
+a.href = url;
+a.download = outputName;
+a.click();
+
+allClips.push(blob);
+}
+
+async function exportClips(videoData){
+
+for(let i=0;i<videoData.clips.length;i++){
+
+await exportSingleClip(
+videoData,
+videoData.clips[i],
+i
+);
+
+}
+}
+
+downloadAllBtn.addEventListener(
+'click',
+async()=>{
+
+if(!videos.length){
+alert('No videos');
+return;
+}
+
+for(const v of videos){
+
+await exportClips(v);
+
+}
+});
+
+exportBtn.addEventListener(
+'click',
+async()=>{
+
+if(videos.length < 2){
+alert('Add minimum 2 videos');
+return;
+}
+
+await loadFFmpeg();
+
+const inputFiles = [];
+
+for(let i=0;i<videos.length;i++){
+
+const name = `input${i}.mp4`;
+
+await ffmpeg.writeFile(
+name,
+await fetchFile(videos[i].file)
+);
+
+inputFiles.push(name);
+}
+
+let filter = '';
+
+for(let i=0;i<inputFiles.length;i++){
+
+filter += `[${i}:v][${i}:a]`;
+
+}
+
+filter +=
+`concat=n=${inputFiles.length}:v=1:a=1[outv][outa]`;
+
+const args = [];
+
+inputFiles.forEach(f=>{
+
+args.push('-i',f);
+
+});
+
+args.push(
+'-filter_complex',
+filter,
+'-map',
+'[outv]',
+'-map',
+'[outa]',
+'merged.mp4'
+);
+
+await ffmpeg.exec(args);
+
+const data =
+await ffmpeg.readFile('merged.mp4');
+
+const blob =
+new Blob(
+[data.buffer],
+{ type:'video/mp4' }
+);
+
+const url =
+URL.createObjectURL(blob);
+
+const a =
+document.createElement('a');
+
+a.href = url;
+a.download = 'merged.mp4';
+a.click();
+
+});
+
+clearBtn.addEventListener(
+'click',
+()=>{
+
+videos = [];
+allClips = [];
+
+grid.innerHTML = '';
+
+statusEl.textContent =
+'No videos loaded.';
+
+progressBar.style.width = '0%';
+
+progressContainer.style.display = 'none';
+
+});
+
+</script>
+
+</body>
+</html>
