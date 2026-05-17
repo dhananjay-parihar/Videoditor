@@ -363,7 +363,7 @@ window.deleteClip=function(id,i){
 window.downloadClipBrowser=async function(id,i){
   const v=videos.find(x=>x.id===id);
   const clip=v.clips[i];
-  
+  const downloadStartTime = performance.now();
   status.textContent="Preparing clip for download...";
   showProgress(10);
   
@@ -422,7 +422,8 @@ window.downloadClipBrowser=async function(id,i){
       if(videoEl && videoEl.parentNode) document.body.removeChild(videoEl);
       showProgress(100);
       setTimeout(()=>{ document.getElementById("progressContainer").style.display="none"; },1000);
-      status.textContent="Clip downloaded successfully (WebM format).";
+      const elapsed = performance.now() - downloadStartTime;
+status.textContent=`Clip downloaded successfully in ${formatElapsed(elapsed)} (WebM format).`;
     };
     
     showProgress(30);
@@ -439,8 +440,27 @@ window.downloadClipBrowser=async function(id,i){
     // Draw frames by video frame callback when available
     const drawFrame = (now, metadata) => {
       ctx.drawImage(videoEl,0,0,canvas.width,canvas.height);
-      const progress=30 + ((videoEl.currentTime-clip.start)/duration)*60;
-      updateProgress(progress);
+      const progress = 30 + ((videoEl.currentTime - clip.start) / duration) * 60;
+updateProgress(progress);
+
+const elapsed = performance.now() - downloadStartTime;
+
+// Calculate estimated remaining time
+const actualProgress = (progress - 30) / 60;
+
+let remainingText = "--";
+
+if(actualProgress > 0){
+  const estimatedTotal = elapsed / actualProgress;
+  const remaining = estimatedTotal - elapsed;
+
+  remainingText = formatElapsed(remaining);
+}
+
+status.textContent =
+  `Downloading clip... ${Math.round(progress)}% • ` +
+  `${formatElapsed(elapsed)} elapsed • ` +
+  `~${remainingText} remaining`;
     };
     
     if ('requestVideoFrameCallback' in HTMLVideoElement.prototype) {
@@ -523,6 +543,19 @@ function showProgress(p){
 }
 function updateProgress(p){
   document.getElementById("progressBar").style.width=Math.min(100,p)+"%";
+}
+
+function formatElapsed(ms){
+  const sec = Math.max(0, ms / 1000);
+
+  if(sec < 60){
+    return `${sec.toFixed(1)}s`;
+  }
+
+  const min = Math.floor(sec / 60);
+  const rem = Math.floor(sec % 60);
+
+  return `${min}m ${rem}s`;
 }
 
 let ffmpeg=null;
@@ -835,6 +868,7 @@ downloadAllBtn.addEventListener("click",async()=>{
 async function downloadSingleClip(v,clipIndex,start,end){
   return new Promise(async(resolve,reject)=>{
     try {
+      const downloadStartTime = performance.now();
       // Create a hidden video element for recording
       const videoEl=document.createElement('video');
       videoEl.src=v.url;
@@ -879,6 +913,10 @@ async function downloadSingleClip(v,clipIndex,start,end){
         a.click();
         URL.revokeObjectURL(url);
         if(videoEl && videoEl.parentNode) document.body.removeChild(videoEl);
+        const elapsed = performance.now() - downloadStartTime;
+
+status.textContent =
+  `Clip ${clipIndex+1} downloaded in ${formatElapsed(elapsed)}`;
         resolve();
       };
       
