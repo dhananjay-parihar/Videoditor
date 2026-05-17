@@ -155,8 +155,7 @@ width:100%
 }
 
 .video-frame{
-min-height:200px;
-height:auto
+min-height:220px
 }
 
 .actions{
@@ -175,16 +174,6 @@ justify-content:center
 .btn{
 font-size:13px;
 padding:6px 10px
-}
-
-.small{
-font-size:12px;
-padding:3px 6px
-}
-
-.notice{
-font-size:11px;
-padding:6px 8px
 }
 
 main{
@@ -231,7 +220,7 @@ flex-wrap:wrap
 }
 
 .inrow input{
-width:85px;
+width:100px;
 padding:4px;
 border-radius:6px;
 border:1px solid #334;
@@ -303,10 +292,14 @@ margin-top:8px
 <div class="app">
 
 <header>
+
 <h1>Browser Video Editor</h1>
 
 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-<label for="files" class="btn">Select Videos</label>
+
+<label for="files" class="btn">
+Select Videos
+</label>
 
 <input
 id="files"
@@ -327,7 +320,9 @@ Download All Clips
 <button id="clearBtn" class="btn ghost">
 Clear All
 </button>
+
 </div>
+
 </header>
 
 <div id="progressContainer">
@@ -339,6 +334,7 @@ Clear All
 </main>
 
 <footer style="display:flex;gap:10px;flex-wrap:wrap">
+
 <div id="status" style="font-size:13px;color:#94a3b8">
 No videos loaded.
 </div>
@@ -349,37 +345,50 @@ id="ffmpegStatus"
 >
 FFmpeg: Not loaded
 </div>
+
 </footer>
 
 </div>
 
 <script type="module">
 
-
-const filesInput = document.getElementById('files');
-const grid = document.getElementById('grid');
-const statusEl = document.getElementById('status');
-const ffmpegStatus = document.getElementById('ffmpegStatus');
-const progressContainer = document.getElementById('progressContainer');
-const progressBar = document.getElementById('progressBar');
-
-const exportBtn = document.getElementById('exportBtn');
-const downloadAllBtn = document.getElementById('downloadAllBtn');
-const clearBtn = document.getElementById('clearBtn');
-
-let ffmpeg;
-let videos = [];
-let allClips = [];
-
 import {
-FFmpeg
-} from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
-
-import {
+createFFmpeg,
 fetchFile
-} from 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js';
+} from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js';
 
-let ffmpeg;
+const filesInput =
+document.getElementById('files');
+
+const grid =
+document.getElementById('grid');
+
+const statusEl =
+document.getElementById('status');
+
+const ffmpegStatus =
+document.getElementById('ffmpegStatus');
+
+const progressContainer =
+document.getElementById('progressContainer');
+
+const progressBar =
+document.getElementById('progressBar');
+
+const exportBtn =
+document.getElementById('exportBtn');
+
+const downloadAllBtn =
+document.getElementById('downloadAllBtn');
+
+const clearBtn =
+document.getElementById('clearBtn');
+
+let ffmpeg = null;
+
+let videos = [];
+
+let allClips = [];
 
 async function loadFFmpeg(){
 
@@ -388,43 +397,53 @@ if(ffmpeg) return ffmpeg;
 ffmpegStatus.textContent =
 'FFmpeg: Loading...';
 
-ffmpeg = new FFmpeg();
+ffmpeg = createFFmpeg({
 
-ffmpeg.on('progress', ({ progress })=>{
+log:true,
 
-progressContainer.style.display = 'block';
+progress:({ ratio })=>{
+
+progressContainer.style.display =
+'block';
 
 progressBar.style.width =
-`${Math.round(progress * 100)}%`;
+`${Math.round(ratio * 100)}%`;
+
+},
+
+corePath:
+'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
 
 });
 
-await ffmpeg.load({
-
-coreURL:
-'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js'
-
-});
+await ffmpeg.load();
 
 ffmpegStatus.textContent =
 'FFmpeg: Loaded';
 
 return ffmpeg;
 }
+
 function formatTime(sec){
 
 sec = Math.max(sec,0);
 
 const m = Math.floor(sec / 60);
+
 const s = Math.floor(sec % 60);
-const ms = Math.floor((sec % 1) * 1000);
+
+const ms =
+Math.floor((sec % 1) * 1000);
 
 return `${m}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
 }
 
-filesInput.addEventListener('change', async(e)=>{
+filesInput.addEventListener(
+'change',
+async(e)=>{
 
-const files = [...e.target.files];
+const files =
+[...e.target.files];
 
 if(!files.length) return;
 
@@ -433,7 +452,8 @@ statusEl.textContent =
 
 for(const file of files){
 
-const url = URL.createObjectURL(file);
+const url =
+URL.createObjectURL(file);
 
 const id =
 Date.now() + Math.random();
@@ -445,13 +465,18 @@ url,
 clips:[]
 });
 
-renderVideo(videos[videos.length - 1]);
+renderVideo(
+videos[videos.length - 1]
+);
+
 }
+
 });
 
 function renderVideo(videoData){
 
-const card = document.createElement('div');
+const card =
+document.createElement('div');
 
 card.className = 'card';
 
@@ -505,7 +530,7 @@ Export Clips
 <div class="clips-list"></div>
 
 <div class="notice">
-Use "Mark Start" and "Mark End" while video plays.
+Use Mark Start and Mark End while video plays.
 </div>
 
 </div>
@@ -513,10 +538,17 @@ Use "Mark Start" and "Mark End" while video plays.
 
 grid.appendChild(card);
 
-const video = card.querySelector('video');
-const durationEl = card.querySelector('.duration');
-const currentEl = card.querySelector('.current');
-const totalEl = card.querySelector('.total');
+const video =
+card.querySelector('video');
+
+const durationEl =
+card.querySelector('.duration');
+
+const currentEl =
+card.querySelector('.current');
+
+const totalEl =
+card.querySelector('.total');
 
 const startInput =
 card.querySelector('.startInput');
@@ -527,7 +559,9 @@ card.querySelector('.endInput');
 const clipsList =
 card.querySelector('.clips-list');
 
-video.addEventListener('loadedmetadata', ()=>{
+video.addEventListener(
+'loadedmetadata',
+()=>{
 
 durationEl.textContent =
 formatTime(video.duration);
@@ -537,7 +571,9 @@ formatTime(video.duration);
 
 });
 
-video.addEventListener('timeupdate', ()=>{
+video.addEventListener(
+'timeupdate',
+()=>{
 
 currentEl.textContent =
 formatTime(video.currentTime);
@@ -545,7 +581,9 @@ formatTime(video.currentTime);
 });
 
 card.querySelector('.markStart')
-.addEventListener('click', ()=>{
+.addEventListener(
+'click',
+()=>{
 
 startInput.value =
 formatTime(video.currentTime);
@@ -553,7 +591,9 @@ formatTime(video.currentTime);
 });
 
 card.querySelector('.markEnd')
-.addEventListener('click', ()=>{
+.addEventListener(
+'click',
+()=>{
 
 endInput.value =
 formatTime(video.currentTime);
@@ -561,9 +601,14 @@ formatTime(video.currentTime);
 });
 
 card.querySelector('.addClip')
-.addEventListener('click', ()=>{
+.addEventListener(
+'click',
+()=>{
 
-if(!startInput.value || !endInput.value){
+if(
+!startInput.value ||
+!endInput.value
+){
 alert('Mark start and end');
 return;
 }
@@ -577,10 +622,13 @@ video:videoData
 videoData.clips.push(clip);
 
 renderClips();
+
 });
 
 card.querySelector('.exportVideo')
-.addEventListener('click', async()=>{
+.addEventListener(
+'click',
+async()=>{
 
 if(!videoData.clips.length){
 alert('No clips');
@@ -588,17 +636,21 @@ return;
 }
 
 await exportClips(videoData);
+
 });
 
 function renderClips(){
 
 clipsList.innerHTML = '';
 
-videoData.clips.forEach((clip,index)=>{
+videoData.clips.forEach(
+(clip,index)=>{
 
-const div = document.createElement('div');
+const div =
+document.createElement('div');
 
-div.className = 'clip-item';
+div.className =
+'clip-item';
 
 div.innerHTML = `
 
@@ -624,15 +676,20 @@ Delete
 clipsList.appendChild(div);
 
 div.querySelector('.delete')
-.addEventListener('click', ()=>{
+.addEventListener(
+'click',
+()=>{
 
 videoData.clips.splice(index,1);
 
 renderClips();
+
 });
 
 div.querySelector('.download')
-.addEventListener('click', async()=>{
+.addEventListener(
+'click',
+async()=>{
 
 await exportSingleClip(
 videoData,
@@ -643,7 +700,9 @@ index
 });
 
 });
+
 }
+
 }
 
 async function exportSingleClip(
@@ -660,12 +719,13 @@ const inputName =
 const outputName =
 `clip_${index + 1}.mp4`;
 
-await ffmpeg.writeFile(
+ffmpeg.FS(
+'writeFile',
 inputName,
 await fetchFile(videoData.file)
 );
 
-await ffmpeg.exec([
+await ffmpeg.run(
 '-ss',
 clip.start,
 '-to',
@@ -675,12 +735,16 @@ inputName,
 '-c',
 'copy',
 outputName
-]);
+);
 
 const data =
-await ffmpeg.readFile(outputName);
+ffmpeg.FS(
+'readFile',
+outputName
+);
 
-const blob = new Blob(
+const blob =
+new Blob(
 [data.buffer],
 { type:'video/mp4' }
 );
@@ -692,15 +756,22 @@ const a =
 document.createElement('a');
 
 a.href = url;
+
 a.download = outputName;
+
 a.click();
 
 allClips.push(blob);
+
 }
 
 async function exportClips(videoData){
 
-for(let i=0;i<videoData.clips.length;i++){
+for(
+let i=0;
+i<videoData.clips.length;
+i++
+){
 
 await exportSingleClip(
 videoData,
@@ -709,6 +780,7 @@ i
 );
 
 }
+
 }
 
 downloadAllBtn.addEventListener(
@@ -725,6 +797,7 @@ for(const v of videos){
 await exportClips(v);
 
 }
+
 });
 
 exportBtn.addEventListener(
@@ -740,23 +813,35 @@ await loadFFmpeg();
 
 const inputFiles = [];
 
-for(let i=0;i<videos.length;i++){
+for(
+let i=0;
+i<videos.length;
+i++
+){
 
-const name = `input${i}.mp4`;
+const name =
+`input${i}.mp4`;
 
-await ffmpeg.writeFile(
+ffmpeg.FS(
+'writeFile',
 name,
 await fetchFile(videos[i].file)
 );
 
 inputFiles.push(name);
+
 }
 
 let filter = '';
 
-for(let i=0;i<inputFiles.length;i++){
+for(
+let i=0;
+i<inputFiles.length;
+i++
+){
 
-filter += `[${i}:v][${i}:a]`;
+filter +=
+`[${i}:v][${i}:a]`;
 
 }
 
@@ -781,10 +866,13 @@ filter,
 'merged.mp4'
 );
 
-await ffmpeg.exec(args);
+await ffmpeg.run(...args);
 
 const data =
-await ffmpeg.readFile('merged.mp4');
+ffmpeg.FS(
+'readFile',
+'merged.mp4'
+);
 
 const blob =
 new Blob(
@@ -799,7 +887,9 @@ const a =
 document.createElement('a');
 
 a.href = url;
+
 a.download = 'merged.mp4';
+
 a.click();
 
 });
@@ -809,6 +899,7 @@ clearBtn.addEventListener(
 ()=>{
 
 videos = [];
+
 allClips = [];
 
 grid.innerHTML = '';
@@ -816,9 +907,11 @@ grid.innerHTML = '';
 statusEl.textContent =
 'No videos loaded.';
 
-progressBar.style.width = '0%';
+progressBar.style.width =
+'0%';
 
-progressContainer.style.display = 'none';
+progressContainer.style.display =
+'none';
 
 });
 
